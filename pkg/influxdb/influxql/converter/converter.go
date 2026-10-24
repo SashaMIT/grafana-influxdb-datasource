@@ -122,6 +122,12 @@ func readSeries(iter *sdkjsoniter.Iterator, query *models.Query) *backend.DataRe
 		if err != nil {
 			return rspErr(err)
 		}
+		// A series with no values key must not keep the previous series' fields.
+		// InfluxDB 1.x omits an empty values array.
+		valueFields = nil
+		columns = nil
+		tags = nil
+		hasTimeColumn = false
 
 		for l1Field, err := iter.ReadObject(); l1Field != ""; l1Field, err = iter.ReadObject() {
 			if err != nil {
